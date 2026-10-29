@@ -93,6 +93,12 @@ input,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid va
 .ferr{font-size:13px;margin-top:3px}[aria-invalid="true"]{border-color:var(--er)!important}
 #mmodal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:grid;place-items:center;z-index:60;padding:16px}#mmodal .box{background:var(--card);border-radius:16px;max-width:760px;width:100%;padding:14px;max-height:92vh;overflow:auto}#mmodal video{width:100%;max-height:60vh;border-radius:10px;background:#000;margin-top:8px}
 .spmenu{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}[hidden]{display:none!important}
+.bfeat{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 6px 18px rgba(20,10,80,.08)}.bfeat .hmc-media{aspect-ratio:auto;min-height:280px}.bfeat-b{padding:22px;display:flex;flex-direction:column;gap:10px;justify-content:center}.bfeat h2{font-size:clamp(22px,3vw,32px)}
+@media(max-width:900px){.bfeat{grid-template-columns:minmax(0,1fr)}.bfeat .hmc-media{aspect-ratio:16/10;min-height:0}}
+.bsec{margin:26px 0 8px}.bsec h2{margin:0 0 10px}.bchips{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.bgal{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}.bgi{margin:0;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}.bgi>button{display:block;position:relative;width:100%;padding:0;border:0;border-radius:0;aspect-ratio:4/3;background:var(--line)}.bgi img{width:100%;height:100%;object-fit:cover;display:block}.bgi figcaption{padding:8px 10px;font-size:13px;display:flex;flex-direction:column;gap:2px}
+.bart{max-width:820px;margin:0 auto}.bart h1{font-size:clamp(26px,4vw,40px);margin:8px 0}.bcover{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:var(--line);margin:8px 0}.bcover img{width:100%;height:100%;object-fit:cover;display:block}
+.bbody{font-size:17px;line-height:1.7}.bbody h3{margin:22px 0 6px}.bbody ul{padding-inline-start:22px}.bbody a{color:var(--pu)}.bfig{margin:16px 0}.bfig .bfb{position:relative;display:block;width:100%;padding:0;border:0;border-radius:12px;overflow:hidden}.bfig img{width:100%;display:block}.bshare{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:18px 0}.bshare .btn{text-decoration:none}
 </style></head><body><div class="shell"><aside id="side"></aside><section class="main" id="main" role="main"><div id="demo" class="demo" role="note"></div><div id="app"></div><p class="mu" style="margin:30px 0 10px">Points are program credits, not cash, and are not a guaranteed return; terms and eligibility rules apply. This page is a demonstration: real balances, payments and verification run on the server (Givana API).</p></section></div><div id="toast" role="status"></div>
 <script>
 const COUNTRIES={ET:{name:"Ethiopia",cur:"ETB",bonus:50,fee:100,usd:130},KE:{name:"Kenya",cur:"KES",bonus:40,fee:100,usd:129},US:{name:"United States",cur:"USD",bonus:1,fee:1,usd:1}};
@@ -114,7 +120,7 @@ function post(type,amt,reason,key){const l=S.ledger[S.session]=S.ledger[S.sessio
  l.unshift({t:new Date().toISOString(),type,amt,reason,key});audit(type,reason);qualify();save();return true}
 function qualify(){}
 const qualified=()=>L().some(e=>e.key==="membership-bonus");
-function nav(){const items=[["home","▦","nav.dashboard"],["wallet","◔","nav.transactions"],["profile","☺","nav.profile"],["campaigns","✦","nav.campaigns"],["market","★","nav.rewards"],["store","▣","nav.stores"],["network","◈","nav.network"],["sponsors","◆","nav.sponsors"],["impact","♡","nav.impact"],["admin","⚙","nav.admin"]];
+function nav(){const items=[["home","▦","nav.dashboard"],["wallet","◔","nav.transactions"],["profile","☺","nav.profile"],["campaigns","✦","nav.campaigns"],["market","★","nav.rewards"],["store","▣","nav.stores"],["network","◈","nav.network"],["sponsors","◆","nav.sponsors"],["impact","♡","nav.impact"],["blog","✎","nav.blog"],["admin","⚙","nav.admin"]];
  const u=S.session?U():null;
  $("side").innerHTML=`<div class="logo">Giv<i>a</i>na</div><div class="mu" style="margin:-8px 0 8px;font-size:12px">${t("brand.tag")}</div>`+
  items.map(([k,i,n])=>`<button class="nv ${tab===k?"on":""}" data-t="${k}"><span>${i}</span>${t(n)}</button>`).join("")+
@@ -436,8 +442,8 @@ function market(){if(guard())return;const c=COUNTRIES[U().country],AP=ALLP(),p=A
  $("nx").onclick=()=>{offer++;render()};$("cash").onclick=()=>openCheckout("PRODUCT",p.id);
  $("use").onclick=()=>{if(confirm("Spend "+cost+" points on "+p.name+"?")&&post("REDEMPTION",-cost,"Redeemed: "+p.name,"red-"+p.id+"-"+Date.now())){render();toast("Redeemed.")}}}
 const RROLES=["MEMBER","SPONSOR","CHARITY_PARTNER","ADMIN","SUPER_ADMIN"];
-const RPERMS=["donation:create","rewards:browse","rewards:redeem","impact:request","store:manage","campaign:create","impact:report","verification:review","sponsors:approve","users:manage","audit:read","payments:refund","monthly:reveal","campaigns:manage","projects:manage","system:settings"];
-const RDEF={MEMBER:["donation:create","rewards:browse","rewards:redeem","impact:request"],SPONSOR:["rewards:browse","store:manage","campaign:create"],CHARITY_PARTNER:["impact:request","impact:report","rewards:browse"],ADMIN:["rewards:browse","verification:review","sponsors:approve","users:manage","audit:read","payments:refund","campaigns:manage","projects:manage"],SUPER_ADMIN:RPERMS};
+const RPERMS=["donation:create","rewards:browse","rewards:redeem","impact:request","store:manage","campaign:create","impact:report","verification:review","sponsors:approve","users:manage","audit:read","payments:refund","monthly:reveal","campaigns:manage","projects:manage","system:settings","blog:manage","blog:delete"];
+const RDEF={MEMBER:["donation:create","rewards:browse","rewards:redeem","impact:request"],SPONSOR:["rewards:browse","store:manage","campaign:create"],CHARITY_PARTNER:["impact:request","impact:report","rewards:browse"],ADMIN:["rewards:browse","verification:review","sponsors:approve","users:manage","audit:read","payments:refund","campaigns:manage","projects:manage","blog:manage"],SUPER_ADMIN:RPERMS};
 const rbac=()=>({...RDEF,...(S.rbac||{}),SUPER_ADMIN:RPERMS});
 function admin(){const r=S.rules;
  $("app").innerHTML=`<div class="card"><h2>Business rules</h2><p class="mu">Qualification is configurable, not hard-coded.</p><div class="grid"><div><label>Points threshold</label><input id="th" type="number" min="1" value="${r.threshold}"></div><div><label>Membership bonus</label><input id="bo" type="number" min="0" value="${r.bonus}"></div></div><br><button class="pri" id="sv">Save rules</button></div>
@@ -478,10 +484,10 @@ const role=()=>S.session&&S.users[S.session]?(S.users[S.session].role||"MEMBER")
 const can=p=>role()!=="VISITOR"&&(rbac()[role()]||[]).includes(p);
 const TAB_PERM={home:null,profile:null,impact:null,wallet:"donation:create",campaigns:"donation:create",network:"donation:create",pay:"donation:create",market:"rewards:browse",help:"impact:request",sponsors:"store:manage",admin:"audit:read"};
 const TAB_ROLE={wallet:["MEMBER"],campaigns:["MEMBER"],network:["MEMBER"],pay:["MEMBER"],sponsors:["SPONSOR"],help:["MEMBER","CHARITY_PARTNER"]};
-const tabAllowed=k=>k==="home"||(!!S.session&&(TAB_PERM[k]===null||can(TAB_PERM[k]))&&(!TAB_ROLE[k]||TAB_ROLE[k].includes(role())));
+const tabAllowed=k=>k==="home"||k==="blog"||(!!S.session&&(TAB_PERM[k]===null||can(TAB_PERM[k]))&&(!TAB_ROLE[k]||TAB_ROLE[k].includes(role())));
 function guard(){if(!S.session){$("app").innerHTML=`<div class="card"><h2>Sign in required</h2><p class="mu">Sign in or create an account on the Home page first.</p></div>`;return true}
  if(!tabAllowed(tab)){$("app").innerHTML=`<div class="card"><h2>Access denied</h2><p class="mu">Your role (${ROLE_LABEL[role()]}) cannot open this page. In production the server checks permission on every request; hiding a menu item is never enough.</p></div>`;return true}return false}
-function nav(){const items=[["home","▦","nav.dashboard"],["wallet","◔","nav.transactions"],["profile","☺","nav.profile"],["campaigns","✦","nav.campaigns"],["market","★","nav.rewards"],["store","▣","nav.stores"],["live","●","nav.live"],["network","◈","nav.network"],["sponsors","◆","nav.sponsors"],["impact","♡","nav.impact"],["admin","⚙","nav.admin"]].filter(([k])=>tabAllowed(k));
+function nav(){const items=[["home","▦","nav.dashboard"],["wallet","◔","nav.transactions"],["profile","☺","nav.profile"],["campaigns","✦","nav.campaigns"],["market","★","nav.rewards"],["store","▣","nav.stores"],["live","●","nav.live"],["network","◈","nav.network"],["sponsors","◆","nav.sponsors"],["impact","♡","nav.impact"],["blog","✎","nav.blog"],["admin","⚙","nav.admin"]].filter(([k])=>tabAllowed(k));
  const u=S.session?U():null;
  $("side").innerHTML=`<div class="logo">Giv<i>a</i>na</div><div class="mu" style="margin:-8px 0 8px;font-size:12px">${t("brand.tag")}</div>`+
  items.map(([k,i,n])=>`<button class="nv ${tab===k||(k==="impact"&&tab==="help")?"on":""}" data-t="${k}" ${tab===k||(k==="impact"&&tab==="help")?'aria-current="page"':""}><span aria-hidden="true">${i}</span>${k==="home"&&!S.session?t("nav.home"):t(n)}</button>`).join("")+
@@ -493,7 +499,7 @@ function nav(){const items=[["home","▦","nav.dashboard"],["wallet","◔","nav.
  const lg=$("lang");if(lg)lg.onchange=e=>{S.lang=e.target.value;save();render()}}
 function render(){applyLang();tickStreams();nav();
  $("demo").innerHTML=`<b>DEMO MODE.</b> Sign-in, roles, payments and points are simulated in this browser and can be edited by anyone with access to it. A production server enforces every permission, payment and balance. Money allocation, the A–F pool, the Participation Reserve and point redemptions are simulated here until the Givana finance server is connected (Admin console).`;
- ({home,wallet,campaigns,market,impact,help,sponsors,admin,pay,network,profile,store:storePage,live,watch})[tab]();if(tab==="admin")finPanel();window.scrollTo(0,0)}
+ ({home,wallet,campaigns,market,impact,help,sponsors,admin,pay,network,profile,store:storePage,live,watch,blog:blogPage})[tab]();if(tab==="admin"){finPanel();blogAdmin()}if(tab!=="blog"){if(/^#\/blog/.test(location.hash)){try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}}if(document.title!==BTITLE0)document.title=BTITLE0}window.scrollTo(0,0)}
 // ---- demo authentication
 async function hashPw(pw,salt){try{const d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(salt+":"+pw));return[...new Uint8Array(d)].map(x=>x.toString(16).padStart(2,"0")).join("")}catch(e){let h=5381;for(const ch of salt+pw)h=((h<<5)+h+ch.charCodeAt(0))>>>0;return"w"+h}}
 const newSalt=()=>Math.random().toString(36).slice(2)+Date.now().toString(36);
@@ -1077,7 +1083,7 @@ async function ingestMedia(ownerType,ownerId,o,onp){onp=onp||(()=>{});const id="
  const f=o.file;if(o.kind==="IMAGE"){const e=fileErr(f,"photo");if(e)throw e;await readProgress(f,onp);const blob=await resizeImg(f,1280,0.8,true),thumb=await resizeImg(f,320,0.6,false);if(!(await idb.put(id,blob)))throw"Could not store "+f.name+".";keys.push(id);return{rec:{id,ownerType,ownerId,kind:"IMAGE",title:o.title||f.name.replace(/\.[^.]+$/,""),alt:o.alt||"",idb:id,thumb,mime:"image/jpeg",size:blob.size,created:Date.now()},keys}}
  const e=fileErr(f,"video");if(e)throw e;const buf=await readProgress(f,onp);let dur=0,thumb;try{dur=await readMeta(f);thumb=await frameCover(f,Math.min(1,Math.max(dur-0.2,0.1)))}catch(x){throw f.name+": "+String(x)}
  if(!(await idb.put(id,new Blob([buf],{type:f.type}))))throw"Could not store "+f.name+".";keys.push(id);return{rec:{id,ownerType,ownerId,kind:"VIDEO",title:o.title||f.name.replace(/\.[^.]+$/,""),alt:"",idb:id,dur,thumb,mime:f.type,size:f.size,created:Date.now()},keys}}
-function canViewMedia(m){if(m.ownerType==="PROJECT"){const p=S.projects.find(x=>x.id===m.ownerId);return !!p&&(["APPROVED","ACTIVE","PAUSED","COMPLETED"].includes(p.status)||can("projects:manage"))}
+function canViewMedia(m){if(m.ownerType==="BLOG"){const p=S.blog.posts.find(x=>x.id===m.ownerId);return !!p&&(bPub(p)||can("blog:manage"))}if(m.ownerType==="PROJECT"){const p=S.projects.find(x=>x.id===m.ownerId);return !!p&&(["APPROVED","ACTIVE","PAUSED","COMPLETED"].includes(p.status)||can("projects:manage"))}
  const c=S.cases.find(x=>x.id===m.ownerId);return !!c&&(["VERIFIED","ACTIVE","COMPLETED"].includes(c.status)||(S.session&&c.owner===S.session)||can("verification:review"))}
 function mesc(e){if(e.key==="Escape")closeMedia()}
 function closeMedia(){const m=$("mmodal");if(m){m.querySelectorAll("video").forEach(v=>{try{v.pause()}catch(e){}if(v.src&&v.src.startsWith("blob:"))URL.revokeObjectURL(v.src)});m.querySelectorAll("img[src^='blob:']").forEach(i=>URL.revokeObjectURL(i.src));m.remove()}
@@ -1295,7 +1301,293 @@ async function seedHelp(){const L=" (Sample content for this demo. Not a real fu
  try{for(const m of S.media){if(m.demoClip&&!(await idb.get(m.idb))){const bin=atob(DEMO_CLIPS[m.demoClip]),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);await idb.put(m.idb,new Blob([u],{type:"video/webm"}))}}}catch(e){}}
 function impactItems(){const cs=S.cases.filter(c=>c.status==="ACTIVE"||c.status==="COMPLETED").map(c=>({id:c.id,kind:"case",cat:c.cat,title:c.title||(CATS[c.cat]+" "+c.cat+" support"),sub:pubName(c)+" · "+c.location,story:c.short||c.story,goal:c.amount,cur:c.cur,label:(c.cat==="Medical"?"Patient":c.cat==="Education"?"Student":"Beneficiary")+": Verified",done:c.status==="COMPLETED"})).filter(x=>x.goal>0);
  const ps=S.projects.filter(p=>(p.status==="ACTIVE"||p.status==="COMPLETED")&&p.target>0).map(p=>({id:p.id,kind:"project",cat:p.cat,title:(CATS[p.cat]||"")+" "+p.title,sub:"Givana official project · "+p.location,story:"",goal:p.target,cur:"",label:"Project: Verified",done:p.status==="COMPLETED"}));return cs.concat(ps)}
-async function init(){await idb.open();await seedHelp();await seedDemo();seedCampaigns();await seedStore();await seedVideos();hmParseHash();render()}
+// ================= BLOG & MEDIA CENTER =================
+const BT={
+"nav.blog":["Blog","ብሎግ","Blog","Blog","المدونة"],
+"blog.title":["Blog & Media Center","ብሎግና ሚዲያ ማዕከል","Blog et centre média","Blog y centro de medios","المدونة ومركز الوسائط"],
+"blog.intro":["News, updates, stories, photos and videos from Givana.","ከGivana የሚወጡ ዜናዎች፣ ማሻሻያዎች፣ ታሪኮች፣ ፎቶዎችና ቪዲዮዎች።","Actualités, mises à jour, histoires, photos et vidéos de Givana.","Noticias, novedades, historias, fotos y videos de Givana.","أخبار وتحديثات وقصص وصور ومقاطع فيديو من Givana."],
+"blog.search":["Search articles","ጽሑፎችን ፈልግ","Rechercher des articles","Buscar artículos","ابحث في المقالات"],
+"blog.allcats":["All categories","ሁሉም ምድቦች","Toutes les catégories","Todas las categorías","كل الفئات"],
+"blog.month":["Month","ወር","Mois","Mes","الشهر"],
+"blog.clear":["Clear filters","ማጣሪያዎችን አጽዳ","Effacer les filtres","Borrar filtros","مسح عوامل التصفية"],
+"blog.results":["{n} results","{n} ውጤቶች","{n} résultat(s)","{n} resultado(s)","{n} نتيجة"],
+"blog.featured":["Featured story","ተለይቶ የቀረበ ታሪክ","À la une","Historia destacada","قصة مميزة"],
+"blog.latest":["Latest news","የቅርብ ጊዜ ዜናዎች","Dernières actualités","Últimas noticias","آخر الأخبار"],
+"blog.activities":["Givana activities & projects","የGivana እንቅስቃሴዎችና ፕሮጀክቶች","Activités et projets de Givana","Actividades y proyectos de Givana","أنشطة ومشاريع Givana"],
+"blog.gallery":["Photo gallery","የፎቶ ማዕከል","Galerie photo","Galería de fotos","معرض الصور"],
+"blog.videos":["Video center","የቪዲዮ ማዕከል","Centre vidéo","Centro de video","مركز الفيديو"],
+"blog.read":["Read more","ተጨማሪ ያንብቡ","Lire la suite","Leer más","اقرأ المزيد"],
+"blog.more":["Load more","ተጨማሪ ጫን","Voir plus","Cargar más","تحميل المزيد"],
+"blog.by":["By {a}","በ{a}","Par {a}","Por {a}","بقلم {a}"],
+"blog.back":["Back to Blog","ወደ ብሎግ ተመለስ","Retour au blog","Volver al blog","العودة إلى المدونة"],
+"blog.related":["Related articles","ተዛማጅ ጽሑፎች","Articles liés","Artículos relacionados","مقالات ذات صلة"],
+"blog.share":["Share","አጋራ","Partager","Compartir","مشاركة"],
+"blog.copy":["Copy link","አገናኙን ቅዳ","Copier le lien","Copiar enlace","نسخ الرابط"],
+"blog.copied":["Link copied.","አገናኙ ተቀድቷል።","Lien copié.","Enlace copiado.","تم نسخ الرابط."],
+"blog.none":["No articles to show yet.","እስካሁን የሚታይ ጽሑፍ የለም።","Aucun article à afficher pour le moment.","Aún no hay artículos para mostrar.","لا توجد مقالات لعرضها بعد."],
+"blog.noresults":["No articles match your search.","ከፍለጋዎ ጋር የሚዛመድ ጽሑፍ የለም።","Aucun article ne correspond à votre recherche.","Ningún artículo coincide con su búsqueda.","لا توجد مقالات مطابقة لبحثك."],
+"blog.nophotos":["No photos published yet.","እስካሁን የታተመ ፎቶ የለም።","Aucune photo publiée pour le moment.","Aún no hay fotos publicadas.","لا توجد صور منشورة بعد."],
+"blog.novideos":["No videos published yet.","እስካሁን የታተመ ቪዲዮ የለም።","Aucune vidéo publiée pour le moment.","Aún no hay videos publicados.","لا توجد مقاطع فيديو منشورة بعد."],
+"blog.noact":["No activity reports published yet.","እስካሁን የታተመ የእንቅስቃሴ ሪፖርት የለም።","Aucun rapport d'activité publié pour le moment.","Aún no hay informes de actividades publicados.","لا توجد تقارير أنشطة منشورة بعد."],
+"blog.notfound":["Article not found","ጽሑፉ አልተገኘም","Article introuvable","Artículo no encontrado","المقال غير موجود"],
+"blog.demo":["Demonstration content","የማሳያ ይዘት","Contenu de démonstration","Contenido de demostración","محتوى تجريبي"],
+"blog.demo_note":["Articles marked \"Demonstration content\" only show the layout. They are not Givana news.","\"የማሳያ ይዘት\" ተብለው የተሰየሙ ጽሑፎች አቀማመጡን ብቻ ያሳያሉ። የGivana ዜና አይደሉም።","Les articles marqués « Contenu de démonstration » ne montrent que la mise en page. Ce ne sont pas des actualités de Givana.","Los artículos marcados como «Contenido de demostración» solo muestran el diseño. No son noticias de Givana.","المقالات المعلَّمة «محتوى تجريبي» تعرض التصميم فقط وليست أخبارًا من Givana."],
+"blog.preview":["Preview: this article is not public.","ቅድመ እይታ፡ ይህ ጽሑፍ ለሕዝብ ክፍት አይደለም።","Aperçu : cet article n'est pas public.","Vista previa: este artículo no es público.","معاينة: هذا المقال غير منشور للعامة."],
+"blog.play":["Play video","ቪዲዮ አጫውት","Lire la vidéo","Reproducir video","تشغيل الفيديو"],
+"blog.alsoin":["Also available in","በሌሎች ቋንቋዎችም ይገኛል","Aussi disponible en","También disponible en","متوفر أيضًا بـ"],
+"blog.c.news":["Latest News","የቅርብ ጊዜ ዜና","Dernières nouvelles","Últimas noticias","آخر الأخبار"],
+"blog.c.updates":["Givana Updates","የGivana ማሻሻያዎች","Actualités Givana","Novedades de Givana","تحديثات Givana"],
+"blog.c.events":["Activities & Events","እንቅስቃሴዎችና ዝግጅቶች","Activités et événements","Actividades y eventos","الأنشطة والفعاليات"],
+"blog.c.stories":["Community Stories","የማኅበረሰብ ታሪኮች","Histoires de la communauté","Historias de la comunidad","قصص المجتمع"],
+"blog.c.impact":["Charity & Social Impact","የበጎ አድራጎትና ማኅበራዊ ተጽዕኖ","Solidarité et impact social","Solidaridad e impacto social","الأثر الخيري والاجتماعي"],
+"blog.c.campaigns":["Campaign Updates","የዘመቻ ማሻሻያዎች","Actualités des campagnes","Novedades de campañas","تحديثات الحملات"],
+"blog.c.gallery":["Photo Gallery","የፎቶ ማዕከል","Galerie photo","Galería de fotos","معرض الصور"],
+"blog.c.videos":["Videos","ቪዲዮዎች","Vidéos","Videos","فيديوهات"],
+"blog.c.edu":["Educational Articles","ትምህርታዊ ጽሑፎች","Articles éducatifs","Artículos educativos","مقالات تعليمية"],
+"blog.c.announce":["Announcements","ማስታወቂያዎች","Annonces","Anuncios","إعلانات"],
+"blog.a.manage":["Blog management","የብሎግ አስተዳደር","Gestion du blog","Gestión del blog","إدارة المدونة"],
+"blog.a.note":["Prototype: permissions are checked in this browser. In production the server must enforce them.","ፕሮቶታይፕ፡ ፈቃዶች የሚፈተሹት በዚህ አሳሽ ውስጥ ነው። በእውነተኛ አገልግሎት አገልጋዩ ማስፈጸም አለበት።","Prototype : les droits sont vérifiés dans ce navigateur. En production, le serveur doit les appliquer.","Prototipo: los permisos se comprueban en este navegador. En producción el servidor debe aplicarlos.","نموذج أولي: تُفحص الصلاحيات في هذا المتصفح. في الإنتاج يجب أن يفرضها الخادم."],
+"blog.a.new":["New article","አዲስ ጽሑፍ","Nouvel article","Nuevo artículo","مقال جديد"],
+"blog.a.open":["Open public Blog","ይፋዊውን ብሎግ ክፈት","Ouvrir le blog public","Abrir el blog público","فتح المدونة العامة"],
+"blog.a.edit":["Edit","አርም","Modifier","Editar","تعديل"],
+"blog.a.prev":["Preview","ቅድመ እይታ","Aperçu","Vista previa","معاينة"],
+"blog.a.publish":["Publish","አትም","Publier","Publicar","نشر"],
+"blog.a.unpublish":["Unpublish","ከሕትመት አውርድ","Dépublier","Despublicar","إلغاء النشر"],
+"blog.a.archive":["Archive","በማህደር አስቀምጥ","Archiver","Archivar","أرشفة"],
+"blog.a.delete":["Delete","ሰርዝ","Supprimer","Eliminar","حذف"],
+"blog.a.savedraft":["Save draft","ረቂቅ አስቀምጥ","Enregistrer le brouillon","Guardar borrador","حفظ كمسودة"],
+"blog.a.schedule":["Schedule","መርሐግብር ያውጡ","Programmer","Programar","جدولة"],
+"blog.a.cancel":["Cancel","ይቅር","Annuler","Cancelar","إلغاء"],
+"blog.a.status":["Status","ሁኔታ","Statut","Estado","الحالة"],
+"blog.a.all":["All statuses","ሁሉም ሁኔታዎች","Tous les statuts","Todos los estados","كل الحالات"],
+"blog.a.s.DRAFT":["Draft","ረቂቅ","Brouillon","Borrador","مسودة"],
+"blog.a.s.SCHEDULED":["Scheduled","የታቀደ","Programmé","Programado","مجدول"],
+"blog.a.s.PUBLISHED":["Published","የታተመ","Publié","Publicado","منشور"],
+"blog.a.s.ARCHIVED":["Archived","በማህደር የተቀመጠ","Archivé","Archivado","مؤرشف"],
+"blog.a.f.title":["Title","ርዕስ","Titre","Título","العنوان"],
+"blog.a.f.slug":["URL slug","የዩአርኤል ስም","Slug d'URL","Slug de URL","معرّف الرابط"],
+"blog.a.f.summary":["Summary","ማጠቃለያ","Résumé","Resumen","الملخص"],
+"blog.a.f.body":["Article text","የጽሑፉ ይዘት","Texte de l'article","Texto del artículo","نص المقال"],
+"blog.a.f.cat":["Category","ምድብ","Catégorie","Categoría","الفئة"],
+"blog.a.f.lang":["Language","ቋንቋ","Langue","Idioma","اللغة"],
+"blog.a.f.author":["Author or team","ጸሐፊ ወይም ቡድን","Auteur ou équipe","Autor o equipo","الكاتب أو الفريق"],
+"blog.a.f.date":["Publication date","የሚታተምበት ቀን","Date de publication","Fecha de publicación","تاريخ النشر"],
+"blog.a.f.seot":["SEO title","የፍለጋ ርዕስ","Titre SEO","Título SEO","عنوان SEO"],
+"blog.a.f.seod":["SEO description","የፍለጋ መግለጫ","Description SEO","Descripción SEO","وصف SEO"],
+"blog.a.f.trans":["Translation of (original article)","የትርጉም ምንጭ (ዋናው ጽሑፍ)","Traduction de (article d'origine)","Traducción de (artículo original)","ترجمة لـ (المقال الأصلي)"],
+"blog.a.f.none":["None (this is the original)","የለም (ይህ ዋናው ነው)","Aucun (c'est l'original)","Ninguno (es el original)","لا شيء (هذا هو الأصل)"],
+"blog.a.media":["Photos and videos","ፎቶዎችና ቪዲዮዎች","Photos et vidéos","Fotos y videos","الصور والفيديو"],
+"blog.a.addimg":["Add photos","ፎቶ ጨምር","Ajouter des photos","Añadir fotos","إضافة صور"],
+"blog.a.addvid":["Add video file","የቪዲዮ ፋይል ጨምር","Ajouter une vidéo","Añadir archivo de video","إضافة ملف فيديو"],
+"blog.a.addlink":["Add YouTube or Vimeo link","የYouTube ወይም Vimeo አገናኝ ጨምር","Ajouter un lien YouTube ou Vimeo","Añadir enlace de YouTube o Vimeo","إضافة رابط YouTube أو Vimeo"],
+"blog.a.alt":["Alternative text (required for photos)","አማራጭ ጽሑፍ (ለፎቶዎች ግዴታ)","Texte alternatif (obligatoire pour les photos)","Texto alternativo (obligatorio para fotos)","النص البديل (مطلوب للصور)"],
+"blog.a.caption":["Caption","መግለጫ ጽሑፍ","Légende","Pie de foto","التعليق"],
+"blog.a.cover":["Set as cover","እንደ ሽፋን አድርግ","Définir comme couverture","Usar como portada","تعيين كغلاف"],
+"blog.a.iscover":["Cover","ሽፋን","Couverture","Portada","الغلاف"],
+"blog.a.insert":["Insert in text","በጽሑፉ ውስጥ አስገባ","Insérer dans le texte","Insertar en el texto","إدراج في النص"],
+"blog.a.remove":["Remove","አስወግድ","Retirer","Quitar","إزالة"],
+"blog.a.cats":["Categories","ምድቦች","Catégories","Categorías","الفئات"],
+"blog.a.addcat":["Add category","ምድብ ጨምር","Ajouter une catégorie","Añadir categoría","إضافة فئة"],
+"blog.a.active":["Active","ንቁ","Actif","Activa","مفعّلة"],
+"blog.a.empty":["No articles yet.","እስካሁን ጽሑፍ የለም።","Aucun article pour le moment.","Aún no hay artículos.","لا توجد مقالات بعد."],
+"blog.a.help":["Formatting: ## heading, - list item, **bold**, [text](https://link).","አቀማመጥ፡ ## ርዕስ፣ - የዝርዝር ንጥል፣ **ደማቅ**፣ [ጽሑፍ](https://link)።","Mise en forme : ## titre, - élément de liste, **gras**, [texte](https://lien).","Formato: ## título, - elemento de lista, **negrita**, [texto](https://enlace).","التنسيق: ## عنوان، - عنصر قائمة، **غامق**، [نص](https://link)."],
+"blog.a.confirmdel":["Delete this article permanently?","ይህ ጽሑፍ ለዘለቄታው ይሰረዝ?","Supprimer définitivement cet article ?","¿Eliminar este artículo definitivamente?","حذف هذا المقال نهائيًا؟"],
+"blog.a.perm":["You do not have permission.","ፈቃድ የለዎትም።","Vous n'avez pas l'autorisation.","No tiene permiso.","ليست لديك صلاحية."],
+"blog.a.saved":["Saved.","ተቀምጧል።","Enregistré.","Guardado.","تم الحفظ."],
+"blog.a.fixalt":["Add alternative text to every photo before publishing.","ከማተምዎ በፊት ለእያንዳንዱ ፎቶ አማራጭ ጽሑፍ ያክሉ።","Ajoutez un texte alternatif à chaque photo avant de publier.","Añada texto alternativo a cada foto antes de publicar.","أضف نصًا بديلًا لكل صورة قبل النشر."],
+"blog.a.fixdate":["Choose a future date and time to schedule.","ለማቀድ የወደፊት ቀንና ሰዓት ይምረጡ።","Choisissez une date et une heure futures pour programmer.","Elija una fecha y hora futuras para programar.","اختر تاريخًا ووقتًا مستقبليين للجدولة."],
+"blog.a.fixfield":["Check the title, the URL slug (must be unique) and the category.","ርዕሱን፣ የዩአርኤል ስሙን (ልዩ መሆን አለበት) እና ምድቡን ያረጋግጡ።","Vérifiez le titre, le slug d'URL (unique) et la catégorie.","Revise el título, el slug de URL (único) y la categoría.","تحقق من العنوان ومعرّف الرابط (يجب أن يكون فريدًا) والفئة."],
+"blog.a.fixbody":["Add a summary and the article text before publishing.","ከማተምዎ በፊት ማጠቃለያና የጽሑፍ ይዘት ያክሉ።","Ajoutez un résumé et le texte avant de publier.","Añada un resumen y el texto antes de publicar.","أضف ملخصًا ونص المقال قبل النشر."]
+};
+["en","am","fr","es","ar"].forEach((l,i)=>{for(const k in BT)DICT[l][k]=BT[k][i]});
+
+// ---- data, helpers
+const BKEYS=["news","updates","events","stories","impact","campaigns","gallery","videos","edu","announce"],BACT=["events","stories","impact","campaigns"],BRESERVED=["gallery","videos","manage","new"];
+S.blog=S.blog||{v:1,cats:BKEYS.map(k=>({id:"c_"+k,key:k,name:"",active:true})),posts:[],featuredId:null,seeded:false};
+const BTITLE0=document.title,bl={q:"",cat:"",month:"",page:1,gcat:"",gpage:1,vpage:1,slug:null};
+const bLoc=()=>({am:"am-ET",fr:"fr",es:"es",ar:"ar",en:"en"})[S.lang]||"en";
+const bDate=ms=>{try{return new Date(ms).toLocaleDateString(bLoc(),{year:"numeric",month:"short",day:"numeric"})}catch(e){return new Date(ms).toISOString().slice(0,10)}};
+const bYM=ms=>{const d=new Date(ms);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")};
+const bCat=id=>S.blog.cats.find(c=>c.id===id);
+const bCatName=c=>c?(c.key?t("blog.c."+c.key):c.name):"";
+const bEff=p=>p.status==="SCHEDULED"&&p.publishAt<=Date.now()?"PUBLISHED":p.status;
+const bPub=p=>bEff(p)==="PUBLISHED";
+const bMedia=p=>(p.mediaIds||[]).map(id=>S.media.find(m=>m.id===id)).filter(Boolean);
+const bCoverM=p=>S.media.find(m=>m.id===p.coverId&&(p.mediaIds||[]).includes(m.id))||bMedia(p).find(m=>m.kind==="IMAGE")||bMedia(p)[0]||null;
+const bCoverSrc=p=>{const m=bCoverM(p);return m&&m.thumb?m.thumb:hmCover(p.title,"Community")};
+const bPosts=()=>S.blog.posts.filter(bPub).sort((a,b)=>b.publishAt-a.publishAt);
+const bMatch=p=>(!bl.cat||p.catId===bl.cat)&&(!bl.month||bYM(p.publishAt)===bl.month)&&(!bl.q||(p.title+" "+p.summary+" "+p.body).toLowerCase().includes(bl.q.toLowerCase()));
+const bDemoPill=p=>p.demo?`<span class="hmb demo">${esc(t("blog.demo"))}</span>`:"";
+function bMeta(desc,title){const set=(sel,attr,key,val)=>{let el=document.head.querySelector(sel);if(!el){el=document.createElement("meta");el.setAttribute(attr,key);document.head.appendChild(el)}el.setAttribute("content",val)};set('meta[name="description"]',"name","description",desc||"");set('meta[property="og:title"]',"property","og:title",title||document.title);set('meta[property="og:description"]',"property","og:description",desc||"")}
+const bUrl=p=>location.href.split("#")[0]+"#/blog/"+encodeURIComponent(p.slug);
+// safe formatter: everything is escaped first; only headings, lists, bold, https links and own-media tokens are re-introduced
+function bFig(id,p,mm){const m0=S.media.find(x=>x.id===id&&x.ownerId===p.id);if(!m0)return"";const m=Object.assign({},m0,(mm&&mm[id])||{}),cap=m.caption?`<figcaption class="mu">${esc(m.caption)}</figcaption>`:"";
+ if(m.kind==="IMAGE")return`<figure class="bfig"><button class="bfb" data-mo="${esc(id)}" aria-label="${esc(m.alt||m.title||"")}"><img data-big="${esc(id)}" src="${esc(m.thumb||m.src||"")}" alt="${esc(m.alt||"")}" loading="lazy"></button>${cap}</figure>`;
+ return`<figure class="bfig"><button class="bfb" data-mo="${esc(id)}" aria-label="${esc(t("blog.play"))}: ${esc(m.title||"")}"><img src="${esc(m.thumb||"")}" alt="" loading="lazy"><span class="play" aria-hidden="true">▶</span></button>${cap||`<figcaption class="mu">${esc(m.title||"")}</figcaption>`}</figure>`}
+function bFmt(txt,p,mm){const inl=s=>s.replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>").replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener noreferrer nofollow">$1</a>');
+ let out="",list=false,para=[];const fp=()=>{if(para.length){out+="<p>"+inl(para.join("<br>"))+"</p>";para=[]}},fl=()=>{if(list){out+="</ul>";list=false}};
+ for(const raw of esc(txt||"").split("\n")){const l=raw.trim();let m;
+  if(!l){fp();fl();continue}
+  if(m=/^\[\[media:([\w-]+)\]\]$/.exec(l)){fp();fl();out+=bFig(m[1],p,mm);continue}
+  if(/^### /.test(l)){fp();fl();out+="<h4>"+inl(l.slice(4))+"</h4>";continue}
+  if(/^## /.test(l)){fp();fl();out+="<h3>"+inl(l.slice(3))+"</h3>";continue}
+  if(/^- /.test(l)){fp();if(!list){out+="<ul>";list=true}out+="<li>"+inl(l.slice(2))+"</li>";continue}
+  fl();para.push(l)}
+ fp();fl();return out}
+async function bHydrate(){for(const img of document.querySelectorAll("#app img[data-big]")){const m=S.media.find(x=>x.id===img.dataset.big);if(!m||!m.idb||m.kind!=="IMAGE")continue;try{const b=await idb.get(m.idb);if(b&&b.type&&b.type.indexOf("image/")===0)img.src=URL.createObjectURL(b)}catch(e){}}}
+// ---- routing (public: no account needed). Clean-URL shape #/blog and #/blog/<slug>
+function blogSetHash(){try{history.replaceState(null,"",bl.slug?"#/blog/"+encodeURIComponent(bl.slug):"#/blog")}catch(e){}}
+function blogParseHash(){const m=(location.hash||"").match(/^#\/blog(?:\/([^\/?#]+))?\/?$/);if(!m)return false;tab="blog";try{bl.slug=m[1]?decodeURIComponent(m[1]):null}catch(e){bl.slug=null}return true}
+if(typeof window!=="undefined"&&window.addEventListener){window.addEventListener("hashchange",()=>{if(blogParseHash())render()});document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest('#side button[data-t="blog"]');if(b)bl.slug=null},true)}
+// ---- cards and sections
+function bCard(p){const c=bCat(p.catId),m=bCoverM(p),v=m&&(m.kind==="VIDEO"||m.kind==="EMBED");
+ return`<article class="hmc bcard" lang="${esc(p.lang||"en")}"><div class="hmc-media"><img src="${esc(bCoverSrc(p))}" alt="${esc(m&&m.alt||"")}" loading="lazy">${v?'<span class="play sm" aria-hidden="true">▶</span>':""}<span class="hmc-badges">${bDemoPill(p)}</span></div><div class="hmc-body"><div class="mu">${esc(bCatName(c))} · <time datetime="${new Date(p.publishAt).toISOString()}">${esc(bDate(p.publishAt))}</time></div><h3><a href="#/blog/${encodeURIComponent(p.slug)}">${esc(p.title)}</a></h3><p class="mu hmc-short">${esc(p.summary)}</p><div class="mu">${esc(t("blog.by",{a:p.author}))}</div><a class="mu" href="#/blog/${encodeURIComponent(p.slug)}" aria-label="${esc(t("blog.read"))}: ${esc(p.title)}"><b>${esc(t("blog.read"))} →</b></a></div></article>`}
+function bFeatured(p){const c=bCat(p.catId),m=bCoverM(p),v=m&&(m.kind==="VIDEO"||m.kind==="EMBED");
+ return`<section class="bfeat" aria-label="${esc(t("blog.featured"))}"><div class="hmc-media"><img ${m&&m.kind==="IMAGE"?`data-big="${esc(m.id)}" `:""}src="${esc(bCoverSrc(p))}" alt="${esc(m&&m.alt||p.title)}">${v?'<span class="play big" aria-hidden="true">▶</span>':""}<span class="hmc-badges"><span class="hmb off">${esc(t("blog.featured"))}</span>${bDemoPill(p)}</span></div><div class="bfeat-b"><div class="mu">${esc(bCatName(c))} · <time datetime="${new Date(p.publishAt).toISOString()}">${esc(bDate(p.publishAt))}</time> · ${esc(t("blog.by",{a:p.author}))}</div><h2 style="margin:0">${esc(p.title)}</h2><p>${esc(p.summary)}</p><div><a class="btn pri" style="text-decoration:none;display:inline-block" href="#/blog/${encodeURIComponent(p.slug)}">${esc(t("blog.read"))}</a></div></div></section>`}
+const bEmpty=k=>`<p class="mu" role="status">${esc(t(k))}</p>`;
+const bMoreBtn=(k,shown,total)=>shown<total?`<div style="text-align:center;margin:12px 0"><button data-bm="${k}">${esc(t("blog.more"))}</button></div>`:"";
+function blogHome(){const all=bPosts(),filt=!!(bl.q||bl.cat||bl.month),cats=S.blog.cats.filter(c=>c.active);
+ let h=`<div class="hm-hero"><h1>${esc(t("blog.title"))}</h1><p>${esc(t("blog.intro"))}</p></div>`;
+ if(all.some(p=>p.demo))h+=`<p class="mu" role="note">${esc(t("blog.demo_note"))}</p>`;
+ h+=`<div class="hm-tools" role="search"><input id="bq" type="search" value="${esc(bl.q)}" placeholder="${esc(t("blog.search"))}" aria-label="${esc(t("blog.search"))}"><select id="bcat" aria-label="${esc(t("blog.allcats"))}"><option value="">${esc(t("blog.allcats"))}</option>${cats.map(c=>`<option value="${esc(c.id)}"${bl.cat===c.id?" selected":""}>${esc(bCatName(c))}</option>`).join("")}</select><input id="bmonth" type="month" value="${esc(bl.month)}" aria-label="${esc(t("blog.month"))}" style="width:auto">${filt?`<button id="bclr">${esc(t("blog.clear"))}</button>`:""}</div>`;
+ if(filt){const res=all.filter(bMatch),sh=res.slice(0,bl.page*9);h+=`<div class="bsec"><h2>${esc(t("blog.results",{n:res.length}))}</h2>${sh.length?`<div class="hmgrid">${sh.map(bCard).join("")}</div>`:bEmpty("blog.noresults")}${bMoreBtn("page",sh.length,res.length)}</div>`}
+ else{
+  const feat=all.find(p=>p.id===S.blog.featuredId)||all[0],rest=all.filter(p=>p!==feat),lat=rest.slice(0,bl.page*6);
+  h+=feat?`<div class="bsec">${bFeatured(feat)}</div>`:"";
+  h+=`<div class="bsec" id="bs-latest"><h2>${esc(t("blog.latest"))}</h2>${lat.length?`<div class="hmgrid">${lat.map(bCard).join("")}</div>`:bEmpty("blog.none")}${bMoreBtn("page",lat.length,rest.length)}</div>`;
+  const act=all.filter(p=>{const c=bCat(p.catId);return c&&c.key&&BACT.includes(c.key)}).slice(0,3);
+  h+=`<div class="bsec" id="bs-act"><h2>${esc(t("blog.activities"))}</h2>${act.length?`<div class="hmgrid">${act.map(bCard).join("")}</div>`:bEmpty("blog.noact")}</div>`;
+  const imgs=[];all.forEach(p=>bMedia(p).filter(m=>m.kind==="IMAGE").forEach(m=>imgs.push({m,p})));
+  const gcs=S.blog.cats.filter(c=>imgs.some(x=>x.p.catId===c.id)),gi=imgs.filter(x=>!bl.gcat||x.p.catId===bl.gcat),gs=gi.slice(0,bl.gpage*8);
+  h+=`<div class="bsec" id="bs-gal"><h2>${esc(t("blog.gallery"))}</h2>${gcs.length>1?`<div class="bchips" role="group" aria-label="${esc(t("blog.allcats"))}"><button data-gc="" class="${bl.gcat?"":"on"}" aria-pressed="${!bl.gcat}">${esc(t("blog.allcats"))}</button>${gcs.map(c=>`<button data-gc="${esc(c.id)}" class="${bl.gcat===c.id?"on":""}" aria-pressed="${bl.gcat===c.id}">${esc(bCatName(c))}</button>`).join("")}</div>`:""}${gs.length?`<div class="bgal">${gs.map(({m,p})=>`<figure class="bgi"><button data-mo="${esc(m.id)}" aria-label="${esc(m.alt||m.title)}"><img src="${esc(m.thumb||m.src||"")}" alt="${esc(m.alt||m.title)}" loading="lazy"></button><figcaption><span>${esc(m.caption||m.title)}</span><span class="mu"><time datetime="${new Date(p.publishAt).toISOString()}">${esc(bDate(p.publishAt))}</time> · ${esc(bCatName(bCat(p.catId)))}</span></figcaption></figure>`).join("")}</div>`:bEmpty("blog.nophotos")}${bMoreBtn("gpage",gs.length,gi.length)}</div>`;
+  const vids=[];all.forEach(p=>bMedia(p).filter(m=>m.kind==="VIDEO"||m.kind==="EMBED").forEach(m=>vids.push({m,p})));const vs=vids.slice(0,bl.vpage*6);
+  h+=`<div class="bsec" id="bs-vid"><h2>${esc(t("blog.videos"))}</h2>${vs.length?`<div class="hmgrid">${vs.map(({m,p})=>`<article class="hmc"><div class="hmc-media"><img src="${esc(m.thumb||"")}" alt="" loading="lazy"><button class="play" data-mo="${esc(m.id)}" aria-label="${esc(t("blog.play"))}: ${esc(m.title)}">▶</button><span class="hmc-badges">${bDemoPill(p)}</span></div><div class="hmc-body"><div class="mu">${esc(bCatName(bCat(p.catId)))} · <time datetime="${new Date(p.publishAt).toISOString()}">${esc(bDate(p.publishAt))}</time></div><h3>${esc(m.title)}</h3>${m.caption?`<p class="mu hmc-short">${esc(m.caption)}</p>`:""}<a class="mu" href="#/blog/${encodeURIComponent(p.slug)}">${esc(p.title)}</a></div></article>`).join("")}</div>`:bEmpty("blog.novideos")}${bMoreBtn("vpage",vs.length,vids.length)}</div>`}
+ h+=`<p class="hm-foot">Givana · ${esc(t("blog.title"))}</p>`;
+ $("app").innerHTML=h;bWire();bHydrate()}
+function bWire(){const keep=f=>{const y=window.scrollY;f();render();window.scrollTo(0,y)};
+ const q=$("bq");if(q){let tm;q.oninput=()=>{clearTimeout(tm);tm=setTimeout(()=>{bl.q=q.value.trim();bl.page=1;render();const n=$("bq");if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}},300)}}
+ if($("bcat"))$("bcat").onchange=e=>{bl.cat=e.target.value;bl.page=1;render()};
+ if($("bmonth"))$("bmonth").onchange=e=>{bl.month=e.target.value;bl.page=1;render()};
+ if($("bclr"))$("bclr").onclick=()=>{bl.q="";bl.cat="";bl.month="";bl.page=1;render()};
+ document.querySelectorAll("[data-bm]").forEach(b=>b.onclick=()=>keep(()=>{bl[b.dataset.bm]=(bl[b.dataset.bm]||1)+1}));
+ document.querySelectorAll("[data-gc]").forEach(b=>b.onclick=()=>keep(()=>{bl.gcat=b.dataset.gc;bl.gpage=1}));
+ document.querySelectorAll("#app [data-mo]").forEach(b=>b.onclick=()=>openMedia(b.dataset.mo,b))}
+// ---- article page
+function blogArticle(){const p=S.blog.posts.find(x=>x.slug===bl.slug);
+ if(!p||!(bPub(p)||can("blog:manage"))){document.title=BTITLE0;$("app").innerHTML=`<div class="card"><h2>${esc(t("blog.notfound"))}</h2><p><a href="#/blog">← ${esc(t("blog.back"))}</a></p></div>`;return}
+ const c=bCat(p.catId),m=bCoverM(p),vid=m&&(m.kind==="VIDEO"||m.kind==="EMBED"),pub=bPub(p);
+ document.title=(p.seoTitle||p.title)+" · Givana";bMeta(p.seoDesc||p.summary,p.seoTitle||p.title);
+ const grp=S.blog.posts.filter(x=>x!==p&&bPub(x)&&((p.transOf&&(x.id===p.transOf||x.transOf===p.transOf))||(!p.transOf&&x.transOf===p.id))),rel=bPosts().filter(x=>x!==p&&x.catId===p.catId).slice(0,3),url=bUrl(p),enc=encodeURIComponent;
+ const inlined=new RegExp("\\[\\[media:([\\w-]+)\\]\\]","g");const used=new Set();let mm;while((mm=inlined.exec(p.body||""))!==null)used.add(mm[1]);
+ const extra=bMedia(p).filter(x=>!used.has(x.id)&&x.id!==(m&&m.id));
+ $("app").innerHTML=`<article class="bart" lang="${esc(p.lang||"en")}"><ol class="crumb"><li><a href="#/blog">${esc(t("blog.title"))}</a></li><li>${esc(bCatName(c))}</li></ol>${pub?"":`<p class="pill go" role="status">${esc(t("blog.preview"))}</p>`}
+ <div class="bcover">${m?`<img ${m.kind==="IMAGE"?`data-big="${esc(m.id)}" `:""}src="${esc(bCoverSrc(p))}" alt="${esc(m.alt||p.title)}">${vid?`<button class="play" data-mo="${esc(m.id)}" aria-label="${esc(t("blog.play"))}: ${esc(m.title)}">▶</button>`:""}`:`<img src="${esc(bCoverSrc(p))}" alt="">`}</div>
+ <h1>${esc(p.title)}</h1><div class="mu">${esc(bCatName(c))} · <time datetime="${new Date(p.publishAt||p.created).toISOString()}">${esc(bDate(p.publishAt||p.created))}</time> · ${esc(t("blog.by",{a:p.author}))} ${bDemoPill(p)}</div>
+ ${m&&m.caption?`<p class="mu">${esc(m.caption)}</p>`:""}<p style="font-size:18px">${esc(p.summary)}</p><div class="bbody">${bFmt(p.body,p)}</div>
+ ${extra.length?`<div class="bgal" style="margin:14px 0">${extra.map(x=>`<figure class="bgi"><button data-mo="${esc(x.id)}" aria-label="${esc(x.kind==="IMAGE"?(x.alt||x.title):t("blog.play")+": "+x.title)}"><img src="${esc(x.thumb||x.src||"")}" alt="${esc(x.kind==="IMAGE"?(x.alt||x.title):"")}" loading="lazy">${x.kind==="IMAGE"?"":'<span class="play sm" aria-hidden="true">▶</span>'}</button><figcaption><span>${esc(x.caption||x.title)}</span></figcaption></figure>`).join("")}</div>`:""}
+ ${grp.length?`<p class="mu">${esc(t("blog.alsoin"))}: ${grp.map(x=>`<a href="#/blog/${enc(x.slug)}">${esc((LANGS.find(l=>l[0]===x.lang)||[0,x.lang])[1])}</a>`).join(" · ")}</p>`:""}
+ <div class="bshare" role="group" aria-label="${esc(t("blog.share"))}"><b>${esc(t("blog.share"))}:</b><button id="bcopy">${esc(t("blog.copy"))}</button>${navigator.share?`<button id="bnat">${esc(t("blog.share"))}</button>`:""}<a class="btn" target="_blank" rel="noopener noreferrer" href="https://x.com/intent/post?url=${enc(url)}&text=${enc(p.title)}">X</a><a class="btn" target="_blank" rel="noopener noreferrer" href="https://www.facebook.com/sharer/sharer.php?u=${enc(url)}">Facebook</a><a class="btn" target="_blank" rel="noopener noreferrer" href="https://t.me/share/url?url=${enc(url)}&text=${enc(p.title)}">Telegram</a><a class="btn" target="_blank" rel="noopener noreferrer" href="https://wa.me/?text=${enc(p.title+" "+url)}">WhatsApp</a></div>
+ ${rel.length?`<div class="bsec"><h2>${esc(t("blog.related"))}</h2><div class="hmgrid">${rel.map(bCard).join("")}</div></div>`:""}
+ <p><a href="#/blog">← ${esc(t("blog.back"))}</a></p></article>`;
+ $("bcopy").onclick=async()=>{try{await navigator.clipboard.writeText(url);toast(t("blog.copied"))}catch(e){window.prompt(t("blog.copy"),url)}};if($("bnat"))$("bnat").onclick=()=>navigator.share({title:p.title,url}).catch(()=>{});
+ document.querySelectorAll("#app [data-mo]").forEach(b=>b.onclick=()=>openMedia(b.dataset.mo,b));bHydrate()}
+function blogPage(){blogSetHash();if(bl.slug)blogArticle();else{document.title=BTITLE0;blogHome()}}
+
+// ---- administration (inside the existing Admin console). Prototype: checked here; production must enforce on the server.
+let bed=null;const bAdm={q:"",st:""};
+const bSlug=s=>{let x=String(s||"").toLowerCase().normalize("NFKC").replace(/[^\p{L}\p{N}]+/gu,"-").replace(/^-+|-+$/g,"").slice(0,80);return x};
+const bUniqueSlug=(s,id)=>{let base=bSlug(s)||"post",x=base,n=2;while(BRESERVED.includes(x)||S.blog.posts.some(p=>p.slug===x&&p.id!==id))x=base+"-"+n++;return x};
+const bLocal=ms=>ms?new Date(ms-new Date(ms).getTimezoneOffset()*60000).toISOString().slice(0,16):"";
+const bNewId=()=>"p_"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+function bTx(fn,action,ref){const snap=JSON.stringify([S.blog,S.media]);try{fn()}catch(e){const[b,m]=JSON.parse(snap);S.blog=b;S.media=m;throw e}
+ if(!saveOk()){const[b,m]=JSON.parse(snap);S.blog=b;S.media=m;toast("Could not save on this device (storage is full or blocked).");return false}
+ audit(action,ref);save();return true}
+const bDeny=perm=>{if(!can(perm||"blog:manage")){toast(t("blog.a.perm"));return true}return false};
+function bDiscard(){if(!bed)return;bed.added.forEach(id=>{const m=S.media.find(x=>x.id===id);if(m&&m.idb)idb.del(m.idb);S.media=S.media.filter(x=>x.id!==id)});bed=null}
+function blogAdmin(){if(bed&&(bed.owner!==S.session||!can("blog:manage")))bDiscard();if(!can("blog:manage"))return;const d=document.createElement("div");d.className="card";d.id="blogadm";$("app").appendChild(d);bAdminDraw()}
+function bAdminDraw(){const d=$("blogadm");if(!d)return;if(bed)return bEditorDraw(d);
+ const P=[...S.blog.posts].sort((a,b)=>b.updated-a.updated).filter(p=>(!bAdm.st||bEff(p)===bAdm.st)&&(!bAdm.q||(p.title+" "+p.summary).toLowerCase().includes(bAdm.q.toLowerCase())));
+ const cnt=s=>S.blog.posts.filter(p=>bEff(p)===s).length,sts=["DRAFT","SCHEDULED","PUBLISHED","ARCHIVED"];
+ d.innerHTML=`<h3>${esc(t("blog.a.manage"))}</h3><p class="mu">${esc(t("blog.a.note"))}</p>
+ <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="pri" id="bnew">${esc(t("blog.a.new"))}</button><a class="btn" href="#/blog" style="text-decoration:none">${esc(t("blog.a.open"))}</a>${sts.map(s=>`<span class="pill">${esc(t("blog.a.s."+s))}: ${cnt(s)}</span>`).join("")}</div>
+ <div class="hm-tools"><input id="baq" type="search" value="${esc(bAdm.q)}" placeholder="${esc(t("blog.search"))}" aria-label="${esc(t("blog.search"))}"><select id="bast" aria-label="${esc(t("blog.a.status"))}"><option value="">${esc(t("blog.a.all"))}</option>${sts.map(s=>`<option value="${s}"${bAdm.st===s?" selected":""}>${esc(t("blog.a.s."+s))}</option>`).join("")}</select></div>
+ <div class="tw"><table><tr><th>${esc(t("blog.a.f.title"))}</th><th>${esc(t("blog.a.status"))}</th><th>${esc(t("blog.a.f.cat"))}</th><th>${esc(t("blog.a.f.date"))}</th><th></th></tr>${P.map(p=>{const e=bEff(p);return`<tr><td>${S.blog.featuredId===p.id?"★ ":""}${esc(p.title)}${p.demo?` <span class="pill">${esc(t("blog.demo"))}</span>`:""}</td><td><span class="pill ${e==="PUBLISHED"?"ok":e==="SCHEDULED"?"go":""}">${esc(t("blog.a.s."+e))}</span></td><td>${esc(bCatName(bCat(p.catId)))}</td><td>${p.publishAt?esc(bDate(p.publishAt)):"—"}</td><td style="white-space:nowrap"><button data-be="${p.id}">${esc(t("blog.a.edit"))}</button> <button data-bp="${p.id}">${esc(t("blog.a.prev"))}</button> ${e==="PUBLISHED"||e==="SCHEDULED"?`<button data-bst="${p.id}|DRAFT">${esc(t("blog.a.unpublish"))}</button>`:`<button data-bst="${p.id}|PUBLISHED">${esc(t("blog.a.publish"))}</button>`}${e!=="ARCHIVED"?` <button data-bst="${p.id}|ARCHIVED">${esc(t("blog.a.archive"))}</button>`:""}${can("blog:delete")?` <button data-bdel="${p.id}">${esc(t("blog.a.delete"))}</button>`:""}</td></tr>`}).join("")||`<tr><td colspan="5">${esc(t("blog.a.empty"))}</td></tr>`}</table></div>
+ <h4 style="margin:16px 0 6px">${esc(t("blog.a.cats"))}</h4>${S.blog.cats.map((c,i)=>`<div class="dn"><span>${esc(bCatName(c))}${c.key?"":" ✎"}</span><span style="white-space:nowrap"><button data-bcu="${i}" aria-label="↑ ${esc(bCatName(c))}"${i?"":" disabled"}>↑</button> <button data-bcd="${i}" aria-label="↓ ${esc(bCatName(c))}"${i<S.blog.cats.length-1?"":" disabled"}>↓</button> <label style="display:inline-flex;gap:4px;align-items:center"><input type="checkbox" style="width:auto" data-bca="${i}"${c.active?" checked":""}> ${esc(t("blog.a.active"))}</label>${c.key?"":` <button data-bcr="${i}">${esc(t("blog.a.edit"))}</button>`}</span></div>`).join("")}
+ <div class="row" style="justify-content:flex-start;gap:8px;margin-top:8px"><input id="bcn" maxlength="40" placeholder="${esc(t("blog.a.addcat"))}" aria-label="${esc(t("blog.a.addcat"))}" style="max-width:260px"><button id="bcadd">${esc(t("blog.a.addcat"))}</button></div>`;
+ $("bnew").onclick=()=>{if(bDeny())return;bed=bBlank();bAdminDraw()};
+ const aq=$("baq");let tm;aq.oninput=()=>{clearTimeout(tm);tm=setTimeout(()=>{bAdm.q=aq.value.trim();bAdminDraw();const n=$("baq");n.focus();n.setSelectionRange(n.value.length,n.value.length)},250)};$("bast").onchange=e=>{bAdm.st=e.target.value;bAdminDraw()};
+ d.querySelectorAll("[data-be]").forEach(b=>b.onclick=()=>{if(bDeny())return;bed=bFrom(S.blog.posts.find(p=>p.id===b.dataset.be));bAdminDraw()});
+ d.querySelectorAll("[data-bp]").forEach(b=>b.onclick=()=>{const p=S.blog.posts.find(x=>x.id===b.dataset.bp);bl.slug=p.slug;tab="blog";render()});
+ d.querySelectorAll("[data-bst]").forEach(b=>b.onclick=()=>{const[id,st]=b.dataset.bst.split("|");bSetStatus(id,st)});
+ d.querySelectorAll("[data-bdel]").forEach(b=>b.onclick=()=>bDelete(b.dataset.bdel));
+ d.querySelectorAll("[data-bcu],[data-bcd]").forEach(b=>b.onclick=()=>{if(bDeny())return;const i=+(b.dataset.bcu??b.dataset.bcd),j=b.dataset.bcu!==undefined?i-1:i+1;bTx(()=>{const a=S.blog.cats;[a[i],a[j]]=[a[j],a[i]]},"BLOG_CATEGORY_ORDER",i);bAdminDraw()});
+ d.querySelectorAll("[data-bca]").forEach(b=>b.onchange=()=>{if(bDeny()){b.checked=!b.checked;return}bTx(()=>{S.blog.cats[+b.dataset.bca].active=b.checked},"BLOG_CATEGORY_ACTIVE",b.dataset.bca);bAdminDraw()});
+ d.querySelectorAll("[data-bcr]").forEach(b=>b.onclick=()=>{if(bDeny())return;const c=S.blog.cats[+b.dataset.bcr],n=window.prompt(t("blog.a.addcat"),c.name);if(n&&n.trim()){bTx(()=>{c.name=n.trim().slice(0,40)},"BLOG_CATEGORY_RENAMED",c.id);bAdminDraw()}});
+ $("bcadd").onclick=()=>{if(bDeny())return;const n=$("bcn").value.trim().slice(0,40);if(!n)return;bTx(()=>{S.blog.cats.push({id:"c_"+Date.now().toString(36),key:null,name:n,active:true})},"BLOG_CATEGORY_ADDED",n);bAdminDraw()}}
+function bBlank(){const me=S.session&&S.users[S.session];return{id:bNewId(),owner:S.session,isNew:true,title:"",slug:"",slugTouched:false,summary:"",body:"",catId:(S.blog.cats.find(c=>c.active)||S.blog.cats[0]).id,author:(me&&me.name)||"Givana team",lang:S.lang,status:"DRAFT",publishAt:0,dateStr:"",seoTitle:"",seoDesc:"",coverId:null,mediaIds:[],transOf:"",featured:false,mm:{},added:[],removed:[],preview:false,msg:""}}
+function bFrom(p){const mm={};bMedia(p).forEach(m=>{mm[m.id]={alt:m.alt||"",caption:m.caption||"",title:m.title||""}});return Object.assign({},p,{owner:S.session,isNew:false,slugTouched:true,dateStr:bLocal(p.publishAt),mediaIds:[...(p.mediaIds||[])],transOf:p.transOf||"",featured:S.blog.featuredId===p.id,mm,added:[],removed:[],preview:false,msg:""})}
+function bValidate(d,target){const now=Date.now();
+ if(!d.title.trim()||d.title.length>150||!d.slug||!/^[\p{L}\p{N}-]{1,80}$/u.test(d.slug)||BRESERVED.includes(d.slug)||S.blog.posts.some(p=>p.slug===d.slug&&p.id!==d.id)||!bCat(d.catId))return t("blog.a.fixfield");
+ if(target==="SCHEDULED"&&!(d.dateStr&&new Date(d.dateStr).getTime()>now))return t("blog.a.fixdate");
+ if(target==="PUBLISHED"||target==="SCHEDULED"){if(!d.summary.trim()||!d.body.trim())return t("blog.a.fixbody");
+  if(d.mediaIds.some(id=>{const m=S.media.find(x=>x.id===id);return m&&m.kind==="IMAGE"&&!((d.mm[id]||{}).alt||"").trim()}))return t("blog.a.fixalt")}
+ return""}
+function bSaveEd(target){if(bDeny())return;const d=bed,err=bValidate(d,target);if(err){d.msg=err;return bAdminDraw()}
+ const now=Date.now(),old=S.blog.posts.find(p=>p.id===d.id);let pa=d.dateStr?new Date(d.dateStr).getTime():0;if(target==="PUBLISHED")pa=(pa&&pa<=now)?pa:now;
+ const rec={id:d.id,slug:d.slug,title:d.title.trim(),summary:d.summary.trim(),body:d.body,catId:d.catId,author:(d.author||"").trim().slice(0,80)||"Givana team",lang:d.lang,status:target,publishAt:pa,created:old?old.created:now,updated:now,seoTitle:d.seoTitle.trim().slice(0,70),seoDesc:d.seoDesc.trim().slice(0,160),coverId:d.mediaIds.includes(d.coverId)?d.coverId:null,mediaIds:d.mediaIds.filter(id=>!d.removed.includes(id)),transOf:d.transOf&&d.transOf!==d.id?d.transOf:"",demo:!!(old&&old.demo)};
+ const ok=bTx(()=>{S.media.forEach(m=>{const e=d.mm[m.id];if(e&&m.ownerId===d.id)Object.assign(m,{alt:e.alt.trim().slice(0,200),caption:e.caption.trim().slice(0,200),title:(e.title||m.title).trim().slice(0,120)})});
+  S.media=S.media.filter(m=>!d.removed.includes(m.id));
+  if(old)S.blog.posts[S.blog.posts.indexOf(old)]=rec;else S.blog.posts.push(rec);
+  if(d.featured)S.blog.featuredId=d.id;else if(S.blog.featuredId===d.id)S.blog.featuredId=null},"BLOG_"+target+(old?"_EDIT":"_NEW"),d.id);
+ if(!ok)return;d.removed.forEach(id=>{const m=S.media.find(x=>x.id===id);if(m&&m.idb&&!m.demoClip)idb.del(m.idb)});bed=null;render();toast(t("blog.a.saved"))}
+function bSetStatus(id,st){if(bDeny())return;const p=S.blog.posts.find(x=>x.id===id);if(!p)return;
+ if(st==="PUBLISHED"){const bad=bMedia(p).some(m=>m.kind==="IMAGE"&&!(m.alt||"").trim());if(bad||!p.summary||!p.body)return toast(bad?t("blog.a.fixalt"):t("blog.a.fixbody"))}
+ if(bTx(()=>{p.status=st;p.updated=Date.now();if(st==="PUBLISHED"&&!(p.publishAt&&p.publishAt<=Date.now()))p.publishAt=Date.now();if(st!=="PUBLISHED"&&S.blog.featuredId===p.id&&st==="ARCHIVED")S.blog.featuredId=null},"BLOG_"+st,id)){render()}}
+function bDelete(id){if(bDeny("blog:delete"))return;const p=S.blog.posts.find(x=>x.id===id);if(!p||!window.confirm(t("blog.a.confirmdel")+"\n\n"+p.title))return;
+ const ms=bMedia(p);if(bTx(()=>{S.blog.posts=S.blog.posts.filter(x=>x.id!==id);S.media=S.media.filter(m=>m.ownerId!==id||m.ownerType!=="BLOG");if(S.blog.featuredId===id)S.blog.featuredId=null},"BLOG_DELETED",id)){ms.forEach(m=>{if(m.idb&&!m.demoClip)idb.del(m.idb)});render()}}
+// ---- editor
+function bEditorDraw(d){const e=bed,cats=S.blog.cats.filter(c=>c.active||c.id===e.catId),imgs=e.mediaIds.filter(id=>!e.removed.includes(id));
+ d.innerHTML=`<h3>${esc(t(e.isNew?"blog.a.new":"blog.a.edit"))}</h3>${e.msg?`<p class="neg" role="alert">${esc(e.msg)}</p>`:""}
+ <div class="grid"><div><label for="bf-title">${esc(t("blog.a.f.title"))}</label><input id="bf-title" data-bf="title" maxlength="150" value="${esc(e.title)}"></div><div><label for="bf-slug">${esc(t("blog.a.f.slug"))}</label><input id="bf-slug" data-bf="slug" maxlength="80" value="${esc(e.slug)}"></div>
+ <div><label for="bf-cat">${esc(t("blog.a.f.cat"))}</label><select id="bf-cat" data-bf="catId">${cats.map(c=>`<option value="${esc(c.id)}"${e.catId===c.id?" selected":""}>${esc(bCatName(c))}</option>`).join("")}</select></div>
+ <div><label for="bf-lang">${esc(t("blog.a.f.lang"))}</label><select id="bf-lang" data-bf="lang">${LANGS.map(([c,n])=>`<option value="${c}"${e.lang===c?" selected":""}>${esc(n)}</option>`).join("")}</select></div>
+ <div><label for="bf-author">${esc(t("blog.a.f.author"))}</label><input id="bf-author" data-bf="author" maxlength="80" value="${esc(e.author)}"></div>
+ <div><label for="bf-date">${esc(t("blog.a.f.date"))}</label><input id="bf-date" type="datetime-local" data-bf="dateStr" value="${esc(e.dateStr)}"></div>
+ <div><label for="bf-trans">${esc(t("blog.a.f.trans"))}</label><select id="bf-trans" data-bf="transOf"><option value="">${esc(t("blog.a.f.none"))}</option>${S.blog.posts.filter(p=>p.id!==e.id&&!p.transOf).map(p=>`<option value="${esc(p.id)}"${e.transOf===p.id?" selected":""}>${esc(p.title)} (${esc(p.lang)})</option>`).join("")}</select></div>
+ <div><label style="display:flex;gap:8px;align-items:center;margin-top:26px"><input type="checkbox" style="width:auto" data-bf="featured"${e.featured?" checked":""}> ${esc(t("blog.featured"))}</label></div></div>
+ <label for="bf-sum">${esc(t("blog.a.f.summary"))}</label><textarea id="bf-sum" data-bf="summary" maxlength="300" rows="2" style="width:100%">${esc(e.summary)}</textarea>
+ <label for="bf-body">${esc(t("blog.a.f.body"))}</label><p class="mu">${esc(t("blog.a.help"))}</p><textarea id="bf-body" data-bf="body" maxlength="20000" rows="10" style="width:100%">${esc(e.body)}</textarea>
+ <div class="grid"><div><label for="bf-st">${esc(t("blog.a.f.seot"))}</label><input id="bf-st" data-bf="seoTitle" maxlength="70" value="${esc(e.seoTitle)}"></div><div><label for="bf-sd">${esc(t("blog.a.f.seod"))}</label><input id="bf-sd" data-bf="seoDesc" maxlength="160" value="${esc(e.seoDesc)}"></div></div>
+ <h4 style="margin:14px 0 6px">${esc(t("blog.a.media"))}</h4><div class="row" style="justify-content:flex-start;gap:10px;flex-wrap:wrap"><label class="btn">${esc(t("blog.a.addimg"))}<input id="bimg" type="file" accept="image/png,image/jpeg,image/webp" multiple style="display:none"></label><label class="btn">${esc(t("blog.a.addvid"))}<input id="bvid" type="file" accept="video/mp4,video/webm" style="display:none"></label><input id="blink" placeholder="https://www.youtube.com/watch?v=…" aria-label="${esc(t("blog.a.addlink"))}" style="max-width:320px"><button id="blinkgo">${esc(t("blog.a.addlink"))}</button></div><p id="bmsg" class="mu" role="status"></p>
+ ${imgs.map(id=>{const m=S.media.find(x=>x.id===id);if(!m)return"";const f=e.mm[id]||{alt:"",caption:"",title:""};return`<div class="dn" style="align-items:flex-start;gap:10px;flex-wrap:wrap"><span style="display:flex;gap:8px;align-items:center"><img class="thumb" src="${esc(m.thumb||m.src||"")}" alt=""> ${m.kind==="IMAGE"?"🖼":"▶"} ${e.coverId===id?`<span class="pill ok">${esc(t("blog.a.iscover"))}</span>`:""}</span><span style="flex:1;min-width:220px;display:grid;gap:6px"><input data-bmf="${id}|title" value="${esc(f.title)}" maxlength="120" aria-label="Title"><input data-bmf="${id}|alt" value="${esc(f.alt)}" maxlength="200" placeholder="${esc(t("blog.a.alt"))}" aria-label="${esc(t("blog.a.alt"))}"${m.kind==="IMAGE"?"":" disabled"}><input data-bmf="${id}|caption" value="${esc(f.caption)}" maxlength="200" placeholder="${esc(t("blog.a.caption"))}" aria-label="${esc(t("blog.a.caption"))}"></span><span style="white-space:nowrap"><button data-bmc="${id}">${esc(t("blog.a.cover"))}</button> <button data-bmi="${id}">${esc(t("blog.a.insert"))}</button> <button data-bmr="${id}">${esc(t("blog.a.remove"))}</button></span></div>`}).join("")}
+ ${e.preview?`<div class="card"><h3>${esc(t("blog.a.prev"))}</h3><div class="bart"><h1>${esc(e.title)}</h1><p style="font-size:18px">${esc(e.summary)}</p><div class="bbody">${bFmt(e.body,e,e.mm)}</div></div></div>`:""}
+ <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap;margin-top:14px"><button id="bprev">${esc(t("blog.a.prev"))}</button><button id="bsd">${esc(t("blog.a.savedraft"))}</button><button id="bsc">${esc(t("blog.a.schedule"))}</button><button class="pri" id="bsp">${esc(t("blog.a.publish"))}</button><button id="bcx">${esc(t("blog.a.cancel"))}</button></div>`;
+ const sync=ev=>{const t0=ev.target,f=t0.dataset.bf,mf=t0.dataset.bmf;if(f){e[f]=t0.type==="checkbox"?t0.checked:t0.value;if(f==="title"&&!e.slugTouched){e.slug=bSlug(e.title);const s=$("bf-slug");if(s)s.value=e.slug}if(f==="slug"){e.slugTouched=true;e.slug=bSlug(t0.value)}}else if(mf){const[id,k]=mf.split("|");(e.mm[id]=e.mm[id]||{alt:"",caption:"",title:""})[k]=t0.value}};
+ d.oninput=sync;d.onchange=sync;
+ const up=async files=>{if(bDeny())return;const msg=$("bmsg");try{for(const f of files){msg.textContent="…"+f.name;const r=await ingestMedia("BLOG",e.id,{kind:f.type.indexOf("video")===0?"VIDEO":"IMAGE",file:f,title:f.name.replace(/\.[^.]+$/,""),cat:"Community"},p=>{msg.textContent=f.name+" "+p+"%"});bAddMedia(r.rec)}}catch(x){e.msg=String(x)}bAdminDraw()};
+ $("bimg").onchange=ev=>up([...ev.target.files]);$("bvid").onchange=ev=>up([...ev.target.files]);
+ $("blinkgo").onclick=async()=>{if(bDeny())return;try{const r=await ingestMedia("BLOG",e.id,{kind:"EMBED",url:$("blink").value,title:"",cat:"Community"});bAddMedia(r.rec)}catch(x){e.msg=String(x)}bAdminDraw()};
+ d.querySelectorAll("[data-bmc]").forEach(b=>b.onclick=()=>{e.coverId=b.dataset.bmc;bAdminDraw()});
+ d.querySelectorAll("[data-bmi]").forEach(b=>b.onclick=()=>{const ta=$("bf-body"),pos=ta.selectionStart??ta.value.length,tk="\n\n[[media:"+b.dataset.bmi+"]]\n\n";e.body=ta.value.slice(0,pos)+tk+ta.value.slice(pos);bAdminDraw()});
+ d.querySelectorAll("[data-bmr]").forEach(b=>b.onclick=()=>{const id=b.dataset.bmr;e.removed.push(id);if(e.coverId===id)e.coverId=null;bAdminDraw()});
+ $("bprev").onclick=()=>{e.preview=!e.preview;bAdminDraw()};$("bsd").onclick=()=>bSaveEd("DRAFT");$("bsc").onclick=()=>bSaveEd("SCHEDULED");$("bsp").onclick=()=>bSaveEd("PUBLISHED");
+ $("bcx").onclick=()=>{bDiscard();bAdminDraw()}}
+function bAddMedia(rec){rec.alt="";rec.caption="";S.media.push(rec);bed.mediaIds.push(rec.id);bed.added.push(rec.id);bed.mm[rec.id]={alt:"",caption:"",title:rec.title||""};if(!bed.coverId&&rec.kind==="IMAGE")bed.coverId=rec.id}
+// ---- demonstration content (clearly labelled; never presented as Givana news)
+async function seedBlog(){
+ if(!S.blog.seeded){S.blog.seeded=true;const now=Date.now(),day=864e5;
+  const mkImg=(pid,t0,cat,n)=>{const th=hmCover(t0,cat);return{id:"m_bd"+pid+n,ownerType:"BLOG",ownerId:pid,kind:"IMAGE",title:t0,alt:"Illustration for demonstration (not a real photo)",caption:"Demonstration illustration",thumb:th,src:th,created:now}};
+  const mkVid=(pid,clip,t0,dur)=>({id:"m_bd"+pid+"v",ownerType:"BLOG",ownerId:pid,kind:"VIDEO",title:t0,alt:"",caption:"Demonstration clip",idb:"demo_"+clip,demoClip:clip,mime:"video/webm",dur,thumb:hmCover(t0+" ▶","Community"),created:now});
+  const D=[["welcome","Welcome to the Givana Blog (demonstration)","Demonstration content that shows how a featured story looks.","announce",0,[["Featured layout","Community"]],null,"This is demonstration content. It only shows the layout of a featured story.\n\n## What administrators can do\n- Write articles with headings, lists and links\n- Add photos with alternative text and captions\n- Publish now, schedule, unpublish or archive\n\nReplace this article with real, approved Givana content."],
+   ["activity","Sample community activity report (demonstration)","A layout example for reporting a community activity. Not a real report.","events",2,[["Activity photo 1","Community"],["Activity photo 2","Community"]],null,"This is demonstration content. Real activity reports must only contain verified information and approved media.\n\n## Layout example\nUse headings, short paragraphs and photos with captions."],
+   ["howto","Sample educational article (demonstration)","A layout example for an educational article. Not official guidance.","edu",4,[["Education illustration","Education"]],null,"This is demonstration content and not official guidance.\n\n- Short paragraphs\n- Lists\n- Links such as [Anthropic](https://www.anthropic.com)\n\nPublish real educational articles from the Admin console."],
+   ["video","Sample video update (demonstration)","A layout example for a video update. The clip is a generated test clip.","videos",6,[],["water","Demonstration clip",5],"This is demonstration content. The video is a generated test clip, not a real Givana activity."]];
+  D.forEach(([slug,title,summary,ck,ago,imgs,vid,body])=>{const pid="p_demo_"+slug,ms=imgs.map(([t0,c],n)=>mkImg(pid,t0,c,n));if(vid)ms.push(mkVid(pid,vid[0],vid[1],vid[2]));S.media.push(...ms);
+   S.blog.posts.push({id:pid,slug:"demo-"+slug,title,summary,body,catId:"c_"+ck,author:"Demonstration",lang:"en",status:"PUBLISHED",publishAt:now-ago*day,created:now,updated:now,seoTitle:"",seoDesc:"",coverId:ms[0]?ms[0].id:null,mediaIds:ms.map(m=>m.id),transOf:"",demo:true})});
+  S.blog.featuredId="p_demo_welcome";save()}
+ try{for(const m of S.media){if(m.ownerType==="BLOG"&&m.demoClip&&!(await idb.get(m.idb))){const bin=atob(DEMO_CLIPS[m.demoClip]),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);await idb.put(m.idb,new Blob([u],{type:"video/webm"}))}}}catch(e){}}
+
+async function init(){await idb.open();await seedHelp();await seedDemo();seedCampaigns();await seedStore();await seedVideos();await seedBlog();blogParseHash();hmParseHash();render()}
 
 // ================= Sponsors menu: sections =================
 let spSec="all";
